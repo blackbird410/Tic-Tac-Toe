@@ -23,10 +23,22 @@ const Gameboard = (function () {
 	const updateGridMarked = () => gridMarked++;
 	const getGridMarked = () => gridMarked;
 
+	const newGame = () => {
+		resetBoard();
+		gameOver = false;
+		gridMarked = 0;
+	};
+
+	function displayBoard() {
+		for (let i = 0; i < 9; i++)
+			document.querySelector(`#grid-${i}`).textContent = (board[Math.floor(i / 3)][i % 3] != EMPTY) ? board[Math.floor(i / 3)][i % 3] : ''; 
+	};
+
 	function resetBoard() {
 		for (let i = 0; i < 3; i++)
 			for (let j = 0; j < 3; j++)
 				board[i][j] = EMPTY;
+		displayBoard();
 	};
 
 	function play(e) {
@@ -39,7 +51,8 @@ const Gameboard = (function () {
 			board[row][col] = marker;
 			updateGridMarked();
 			setTurn();
-			e.currentTarget.textContent = marker;
+			//e.currentTarget.textContent = marker;
+			displayBoard();
 		}
 		else if (isGameOver() && getGridMarked() < 9)
 			console.log('GAME OVER!!!!');
@@ -50,9 +63,13 @@ const Gameboard = (function () {
 				player1.updateScore();
 			else
 				player2.updateScore();
+			newGame();
 		}
 		else if (isGameOver())
+		{
 			tie.updateScore();
+			newGame();
+		}
 	};
 
 	function checkWinner() {
@@ -89,7 +106,7 @@ const Gameboard = (function () {
 		return EMPTY;
 	}
 
-	return { getBoard, isGameOver, setTurn, getTurn, play, checkWinner, getWinner, resetBoard };
+	return { getBoard, isGameOver, setTurn, getTurn, play, checkWinner, getWinner, newGame };
 })();
 
 const createPlayer =  (function () {
@@ -119,15 +136,6 @@ const createPlayer =  (function () {
 	return { setMarker, getMarker, resetScore, updateScore, getScore };
 });
 
-
-
-const newGame = (function () {
-	Gameboard.resetBoard();
-
-	player1.setMarker('X');
-	player2.setMarker('O');
-
-});
 
 function createLayout() {
 	const container = document.createElement('div');
