@@ -1,8 +1,5 @@
-createLayout();
-
 const EMPTY = '.';
 const VALID = true;
-
 
 const Gameboard = (function () {
 	let board = [
@@ -13,35 +10,49 @@ const Gameboard = (function () {
 
 	let turn = 'X';
 	let gameOver = false;
+	let gridMarked = 0;
 
-	const setTurn = () => (turn == 'X') ? 'O' : 'X';
+	const setTurn = () => turn = (turn == 'X') ? 'O' : 'X';
 	const getTurn = () => turn;
 
 	const setGameOver = () => gameOver = true;
 	const isGameOver = () => gameOver;
 	const getBoard = () => board;
-	
+
+	const getWinner = () => checkWinner();
+	const updateGridMarked = () => gridMarked++;
+	const getGridMarked = () => gridMarked;
+
 	function resetBoard() {
 		for (let i = 0; i < 3; i++)
 			for (let j = 0; j < 3; j++)
 				board[i][j] = EMPTY;
 	};
 
-	function play(getTurn, row, col) {
-		let winner = checkWinner();
-		if (winner != EMPTY)
-			console.log(`${winner} wins!`);
-
+	function play(e) {
+		let marker = getTurn();
+		let id =  e.currentTarget.id.split('-')[1];
+		let [row, col] = [Math.floor(id / 3), id % 3];
+		
 		if (!isGameOver() && board[row][col] == EMPTY)
 		{
 			board[row][col] = marker;
-			return VALID;
+			updateGridMarked();
+			setTurn();
+			e.currentTarget.textContent = marker;
 		}
-		else if (!isGameOver() && board[row][col] != EMPTY)
-			console.log('CANNOT PLAY HERE!!!');
-		else
+		else if (isGameOver() && getGridMarked() < 9)
 			console.log('GAME OVER!!!!');
-		return !VALID;
+		
+		if (getWinner() != EMPTY)
+		{
+			if (getWinner() == 'X')
+				player1.updateScore();
+			else
+				player2.updateScore();
+		}
+		else if (isGameOver())
+			tie.updateScore();
 	};
 
 	function checkWinner() {
@@ -66,16 +77,19 @@ const Gameboard = (function () {
 
 		// Check both diagonals
 		if ((board[0][0] != EMPTY && board[0][0] == board[1][1] && board[0][0] == board[2][2]) 
-			|| (board[0][2] != EMPTY && board[0][2] == board[1][1] && board[2][0]))
+			|| (board[0][2] != EMPTY && board[0][2] == board[1][1] && board[0][2] == board[2][0]))
 		{
 			setGameOver();
 			return board[1][1];
 		}
 
+		if (getGridMarked() == 9)
+			setGameOver();
+
 		return EMPTY;
 	}
 
-	return { getBoard, isGameOver, setTurn, getTurn, play, checkWinner, resetBoard };
+	return { getBoard, isGameOver, setTurn, getTurn, play, checkWinner, getWinner, resetBoard };
 })();
 
 const createPlayer =  (function () {
@@ -84,38 +98,36 @@ const createPlayer =  (function () {
 
 	const setMarker = (choice) => marker = choice.toUpperCase();
 	const getMarker = () => marker;
-	const updateScore = () => score++;
+	const resetScore = () => score = 0;
+	const updateScore = () => {
+		score++;
+		switch(getMarker())
+                {
+                        case 'X':
+                                document.querySelector('#score-X').textContent = getScore();
+                                break;
+                        case 'O':
+                                document.querySelector('#score-O').textContent = getScore();
+                                break;
+                        default:
+                                document.querySelector('#score-tie').textContent = getScore();
+                                break;
+                }
+	};
 	const getScore = () => score;
 
-	return { setMarker, getMarker, updateScore, getScore };
+	return { setMarker, getMarker, resetScore, updateScore, getScore };
 });
 
 
 
 const newGame = (function () {
-	Gameboard.resetBoard()
-
-	const player1 = createPlayer();
-	const player2 = createPlayer();
+	Gameboard.resetBoard();
 
 	player1.setMarker('X');
 	player2.setMarker('O');
 
-	// Game simulation
-	Gameboard.play(player1.getMarker(), 1, 1);
-	Gameboard.play(player2.getMarker(), 1, 1);
-	Gameboard.play(player2.getMarker(), 1, 0);
-
-        Gameboard.play(player1.getMarker(), 2, 2);
-	Gameboard.play(player2.getMarker(), 0, 0);
-
-	Gameboard.play(player1.getMarker(), 2, 0);
-        Gameboard.play(player2.getMarker(), 2, 1);
-
-	Gameboard.play(player1.getMarker(), 0, 2);
-        Gameboard.play(player2.getMarker(), 1, 1);
 });
-
 
 function createLayout() {
 	const container = document.createElement('div');
@@ -126,8 +138,46 @@ function createLayout() {
 		const grid = document.createElement('div');
 		grid.classList.add('grid');
 		grid.setAttribute('id', `grid-${i}`);
-		grid.textContent = (i % 2) ? 'O' : 'X';
+		grid.addEventListener('click', Gameboard.play);
+
 		container.appendChild(grid);
 	}
+
+	const statusBar = document.createElement('div');
+	statusBar.classList.add('status-bar');
+
+	const statusElement = ['Player(X)', 'Tie', 'Player(O)'];
+	statusElement.forEach(elt => {
+		const elementContainer = document.createElement('div');
+		const title = document.createElement('div');
+		const score = document.createElement('div');
+
+		elementContainer.classList.add('status-element');
+		title.classList.add('title');
+		score.classList.add('score');
+
+		if (elt[0] == 'T')
+			score.setAttribute('id', 'score-tie');
+		else if (elt[7] == 'X')
+			score.setAttribute('id', 'score-X');
+		else
+			score.setAttribute('id', 'score-O');
+
+		title.textContent = elt;
+		score.textContent = '0';
+		
+		elementContainer.appendChild(title);
+		elementContainer.appendChild(score);
+		statusBar.appendChild(elementContainer);
+	});
+
 	document.body.appendChild(container);
+	document.body.appendChild(statusBar);
 }
+
+createLayout();
+const player1 = createPlayer();
+const player2 = createPlayer();
+const tie = createPlayer();
+player1.setMarker('X');
+player2.setMarker('O');

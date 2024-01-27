@@ -1,16 +1,19 @@
 :root {
 	--grid-size: 100px;
-	--grid-gap: 8px;
+	--grid-gap: 4px;
 }
 
 body {
 	background-color: black;
 	display: grid;
 	height: 90vh;
+	grid-template-rows: 3fr 1fr;
 	justify-content: center;
 	align-content: center;
 	justify-items: center;
 	align-items: center;
+	color: white;
+	font-family: Arial, sans-serif;
 }
 
 .main-container {
@@ -18,17 +21,37 @@ body {
 	grid-template-rows: repeat(3, var(--grid-size));
 	grid-template-columns: repeat(3, var(--grid-size));
 	gap: var(--grid-gap);
-	background-color: white;
+	background-color: #ADD8E6;
 }
 
 .grid {
 	background-color: black;
-	color: white;
 	display: grid;
 	justify-items: center;
 	align-items: center;
-	font-family: Arial, sans-serif;
 	font-weight: 500;
 	font-size: 5em;
+	cursor: pointer;
 }
 
+.status-bar {
+	display: grid;
+	align-self: start;
+	justify-items: center;
+	grid-template-columns: repeat(3, 1fr);
+	padding: 12px;
+}
+
+.status-element {
+	margin: 5px;
+}
+
+.title {
+	font-size: 1.5rem;
+	margin-bottom: 8px;	
+}
+
+.score {
+	font-size: 3rem;
+	text-align: center;
+}
