@@ -1,16 +1,5 @@
-// Tic tac to rules
-// The game is played between two entities: X and O
-// The gameboard has a 3x3 matrix that each case is a space that a player can cross with its avatar sign
-// The game is played until one of them wins or there is a draw
-// A player wins when he/she has successfully filled three aligned space whether horizontally, vertically or diagonally with his/her avatar sign
-// There is a draw when there is no space to play anymore
+createLayout();
 
-
-// Implementation steps: 
-// -----------------------
-// 1- The gameboard is going to be stored inside a Gameboard object
-// 2- The players are going to be stored inside Player objects
-// 3- An object will be created to control the flow of the game
 const EMPTY = '.';
 const VALID = true;
 
@@ -22,7 +11,11 @@ const Gameboard = (function () {
 		[EMPTY, EMPTY, EMPTY],
 	];
 
+	let turn = 'X';
 	let gameOver = false;
+
+	const setTurn = () => (turn == 'X') ? 'O' : 'X';
+	const getTurn = () => turn;
 
 	const setGameOver = () => gameOver = true;
 	const isGameOver = () => gameOver;
@@ -34,7 +27,7 @@ const Gameboard = (function () {
 				board[i][j] = EMPTY;
 	};
 
-	function play(marker, row, col) {
+	function play(getTurn, row, col) {
 		let winner = checkWinner();
 		if (winner != EMPTY)
 			console.log(`${winner} wins!`);
@@ -82,7 +75,7 @@ const Gameboard = (function () {
 		return EMPTY;
 	}
 
-	return { getBoard, isGameOver, play, checkWinner, resetBoard };
+	return { getBoard, isGameOver, setTurn, getTurn, play, checkWinner, resetBoard };
 })();
 
 const createPlayer =  (function () {
@@ -96,6 +89,8 @@ const createPlayer =  (function () {
 
 	return { setMarker, getMarker, updateScore, getScore };
 });
+
+
 
 const newGame = (function () {
 	Gameboard.resetBoard()
@@ -121,4 +116,18 @@ const newGame = (function () {
         Gameboard.play(player2.getMarker(), 1, 1);
 });
 
-newGame();
+
+function createLayout() {
+	const container = document.createElement('div');
+	container.classList.add('main-container');
+
+	for (let i = 0; i < 9; i++)
+	{
+		const grid = document.createElement('div');
+		grid.classList.add('grid');
+		grid.setAttribute('id', `grid-${i}`);
+		grid.textContent = (i % 2) ? 'O' : 'X';
+		container.appendChild(grid);
+	}
+	document.body.appendChild(container);
+}
