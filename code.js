@@ -19,6 +19,7 @@ const Gameboard = (function () {
 
 	let turn = 'X';
 	let winner = EMPTY;
+	let winnerMoveDisplayed = false;
 	let gridMarked = 0;
 
 	const setTurn = () => turn = (turn != 'X') ? 'X' : 'O';
@@ -33,8 +34,13 @@ const Gameboard = (function () {
                 	[EMPTY, EMPTY, EMPTY],
 		];
 		gridMarked = 0;
-		Array.from(document.querySelectorAll('.grid')).forEach(grid => grid.textContent = '');
+		winnerMoveDisplayed = false;
+		Array.from(document.querySelectorAll('.grid')).forEach(grid => {
+			grid.textContent = '';
+			grid.style.color = 'white';
+		});
 	};
+
 
 	function play(e) {
 		let gridIndex = e.currentTarget.id.split('-')[1];
@@ -47,7 +53,7 @@ const Gameboard = (function () {
 			updateGridMarked();
 		}
 		
-		if (isGameOver())
+		if (isGameOver() && winnerMoveDisplayed)
 		{
 			console.log(getWinner());
 			switch(getWinner())
@@ -64,16 +70,21 @@ const Gameboard = (function () {
 			}
 			newGame();
 		}
+
+		if (isGameOver() && !winnerMoveDisplayed)
+			winnerMoveDisplayed = true;
 	}
 
 	function isGameOver()
 	{
-		let i = 0;
+		let i = 0, j = 0;
 		for (i = 0; i < 3; i++)
 		{
 			if(board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][1] == board[i][2])
 			{
 				winner = board[i][0];
+				for (j = 0; j < 3; j++)
+					document.querySelector(`#grid-${i * 3 + j}`).style.color = 'orange';
 				return true;
 			}
 		}
@@ -83,6 +94,8 @@ const Gameboard = (function () {
 			if (board[0][i] != EMPTY && board[0][i] == board[1][i] && board[1][i] == board[2][i])
 			{
 				winner = board[0][i];
+				for (j = 0; j < 3; j++)
+					document.querySelector(`#grid-${j * 3 + i}`).style.color = 'orange';
 				return true;
 			}
 		}
@@ -91,6 +104,14 @@ const Gameboard = (function () {
 			|| (board[0][2] != EMPTY && board[0][2] == board[1][1] && board[1][1] == board[2][0]))
 		{
 			winner = board[1][1];
+
+			if (board[0][0] == board[1][1] && board[1][1] == board[2][2])
+				for (j = 0; j < 3; j++)
+					document.querySelector(`#grid-${j * 4}`).style.color = 'orange';
+			else
+				for (j = 0; j < 3; j++)
+					document.querySelector(`#grid-${j * 2 + 2}`).style.color = 'orange';
+
 			return true;
 		}
 
