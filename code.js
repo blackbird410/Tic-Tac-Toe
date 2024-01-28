@@ -9,104 +9,90 @@ const Gameboard = (function () {
 	];
 
 	let turn = 'X';
-	let gameOver = false;
+	let winner = EMPTY;
 	let gridMarked = 0;
 
-	const setTurn = () => turn = (turn == 'X') ? 'O' : 'X';
+	const setTurn = () => turn = (turn != 'X') ? 'X' : 'O';
 	const getTurn = () => turn;
-
-	const setGameOver = () => gameOver = true;
-	const isGameOver = () => gameOver;
-	const getBoard = () => board;
-
-	const getWinner = () => checkWinner();
+	const getWinner = () => winner;
 	const updateGridMarked = () => gridMarked++;
-	const getGridMarked = () => gridMarked;
-
 	const newGame = () => {
-		resetBoard();
-		gameOver = false;
+		winner = EMPTY;
+		board = [
+			[EMPTY, EMPTY, EMPTY],
+                	[EMPTY, EMPTY, EMPTY],
+                	[EMPTY, EMPTY, EMPTY],
+		];
 		gridMarked = 0;
-	};
-
-	function displayBoard() {
-		for (let i = 0; i < 9; i++)
-			document.querySelector(`#grid-${i}`).textContent = (board[Math.floor(i / 3)][i % 3] != EMPTY) ? board[Math.floor(i / 3)][i % 3] : ''; 
-	};
-
-	function resetBoard() {
-		for (let i = 0; i < 3; i++)
-			for (let j = 0; j < 3; j++)
-				board[i][j] = EMPTY;
-		displayBoard();
+		Array.from(document.querySelectorAll('.grid')).forEach(grid => grid.textContent = '');
 	};
 
 	function play(e) {
-		let marker = getTurn();
-		let id =  e.currentTarget.id.split('-')[1];
-		let [row, col] = [Math.floor(id / 3), id % 3];
+		let gridIndex = e.currentTarget.id.split('-')[1];
 		
-		if (!isGameOver() && board[row][col] == EMPTY)
+		if (board[Math.floor(gridIndex / 3)][gridIndex % 3] == EMPTY)
 		{
-			board[row][col] = marker;
-			updateGridMarked();
+			board[Math.floor(gridIndex / 3)][gridIndex % 3] = getTurn();
+			e.currentTarget.textContent = getTurn();
 			setTurn();
-			//e.currentTarget.textContent = marker;
-			displayBoard();
+			updateGridMarked();
 		}
-		else if (isGameOver() && getGridMarked() < 9)
-			console.log('GAME OVER!!!!');
 		
-		if (getWinner() != EMPTY)
+		if (isGameOver())
 		{
-			if (getWinner() == 'X')
-				player1.updateScore();
-			else
-				player2.updateScore();
+			console.log(getWinner());
+			switch(getWinner())
+			{
+				case 'X':
+					player1.updateScore();
+					break;
+				case 'O':
+					player2.updateScore();
+					break;
+				default:
+					tie.updateScore();
+					break;
+			}
 			newGame();
 		}
-		else if (isGameOver())
-		{
-			tie.updateScore();
-			newGame();
-		}
-	};
-
-	function checkWinner() {
-		// Check rows
-		board.forEach(row => {
-			if (row[0] != EMPTY && row[0] == row[1] && row[0] == row[2])
-			{
-				setGameOver();
-				return row[0];
-			}
-		});
-
-		// Check cols
-		for (let i = 0; i < 3; i++)
-		{
-			if (board[0][i] != EMPTY && board[0][i] == board[1][i] && board[0][i] == board[2][i])
-			{
-				setGameOver();
-				return board[0][i];
-			}
-		}
-
-		// Check both diagonals
-		if ((board[0][0] != EMPTY && board[0][0] == board[1][1] && board[0][0] == board[2][2]) 
-			|| (board[0][2] != EMPTY && board[0][2] == board[1][1] && board[0][2] == board[2][0]))
-		{
-			setGameOver();
-			return board[1][1];
-		}
-
-		if (getGridMarked() == 9)
-			setGameOver();
-
-		return EMPTY;
 	}
 
-	return { getBoard, isGameOver, setTurn, getTurn, play, checkWinner, getWinner, newGame };
+	function isGameOver()
+	{
+		let i = 0;
+		for (i = 0; i < 3; i++)
+		{
+			if(board[i][0] != EMPTY && board[i][0] == board[i][1] && board[i][1] == board[i][2])
+			{
+				winner = board[i][0];
+				return true;
+			}
+		}
+
+		for (i = 0; i < 3; i++)
+		{
+			if (board[0][i] != EMPTY && board[0][i] == board[1][i] && board[1][i] == board[2][i])
+			{
+				winner = board[0][i];
+				return true;
+			}
+		}
+
+		if (board[0][0] != EMPTY && board[0][0] == board[1][1] && board[1][1] == board[2][2]
+			|| (board[0][2] != EMPTY && board[0][2] == board[1][1] && board[1][1] == board[2][0]))
+		{
+			winner = board[1][1];
+			return true;
+		}
+
+		if (gridMarked == 9)
+			return true;
+		
+		return false;
+	}
+
+	return { play, isGameOver }
+
 })();
 
 const createPlayer =  (function () {
