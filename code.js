@@ -1,6 +1,14 @@
 const EMPTY = '.';
 const VALID = true;
 
+function restartGame()
+{
+        Gameboard.newGame();
+	player1.resetScore();
+	player2.resetScore();
+}
+
+
 const Gameboard = (function () {
 	let board = [
 		[EMPTY, EMPTY, EMPTY],
@@ -91,19 +99,23 @@ const Gameboard = (function () {
 		return false;
 	}
 
-	return { play, isGameOver }
+	return { play, isGameOver, newGame }
 
 })();
 
 const createPlayer =  (function () {
+	let name;
 	let marker = EMPTY;
 	let score = 0;
 
+	const setName = (inputName) => name = inputName; 
 	const setMarker = (choice) => marker = choice.toUpperCase();
 	const getMarker = () => marker;
-	const resetScore = () => score = 0;
-	const updateScore = () => {
-		score++;
+	const resetScore = () => {
+		score = 0;
+		displayScore();
+	};
+	const displayScore = () => {
 		switch(getMarker())
                 {
                         case 'X':
@@ -117,11 +129,14 @@ const createPlayer =  (function () {
                                 break;
                 }
 	};
+	const updateScore = () => {
+		score++;
+		displayScore();
+	};
 	const getScore = () => score;
 
 	return { setMarker, getMarker, resetScore, updateScore, getScore };
 });
-
 
 function createLayout() {
 	const container = document.createElement('div');
@@ -165,8 +180,19 @@ function createLayout() {
 		statusBar.appendChild(elementContainer);
 	});
 
+	const newGameBtn = document.createElement('button');
+	newGameBtn.textContent = 'New Game';
+	newGameBtn.addEventListener('click', restartGame);
+
+	const copyright = document.createElement('a');
+	copyright.textContent = 'Copyright \u00A9 Neil Taison Rigaud';
+	copyright.setAttribute('href', 'https://blackbird410.github.io/');
+	copyright.target = '_blank';
+
 	document.body.appendChild(container);
 	document.body.appendChild(statusBar);
+	document.body.appendChild(newGameBtn);
+	document.body.appendChild(copyright);
 }
 
 createLayout();

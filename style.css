@@ -1,13 +1,14 @@
 :root {
 	--grid-size: 100px;
 	--grid-gap: 4px;
+	--gap-color: #ADD8E6;
 }
 
 body {
 	background-color: black;
 	display: grid;
-	height: 90vh;
-	grid-template-rows: 3fr 1fr;
+	height: 98vh;
+	grid-template-rows: 3fr 1fr 1fr 50px;
 	justify-content: center;
 	align-content: center;
 	justify-items: center;
@@ -21,7 +22,7 @@ body {
 	grid-template-rows: repeat(3, var(--grid-size));
 	grid-template-columns: repeat(3, var(--grid-size));
 	gap: var(--grid-gap);
-	background-color: #ADD8E6;
+	background-color: var(--gap-color);
 }
 
 .grid {
@@ -40,18 +41,38 @@ body {
 	justify-items: center;
 	grid-template-columns: repeat(3, 1fr);
 	padding: 12px;
-}
-
-.status-element {
-	margin: 5px;
+	gap: 12px;
+	text-align: center;
 }
 
 .title {
 	font-size: 1.5rem;
-	margin-bottom: 8px;	
 }
 
 .score {
 	font-size: 3rem;
-	text-align: center;
+}
+
+button {
+	padding: 12px;
+	border-radius: 16px;
+	outline: none;
+	background-color: var(--gap-color);
+	font-weight: bold;
+	font-size: 1rem;
+}
+
+button:hover {
+	background-color: orange;
+	color: white;	
+}
+
+a {
+	align-self: center;
+	text-decoration: none;
+	color: var(--gap-color);
+}
+
+a:hover {
+	color: orange;
 }
