@@ -6,6 +6,7 @@ function restartGame()
         Gameboard.newGame();
 	player1.resetScore();
 	player2.resetScore();
+	tie.resetScore();
 }
 
 

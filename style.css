@@ -23,6 +23,7 @@ body {
 	grid-template-columns: repeat(3, var(--grid-size));
 	gap: var(--grid-gap);
 	background-color: var(--gap-color);
+	border: none;
 }
 
 .grid {
