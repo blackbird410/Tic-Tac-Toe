@@ -1,5 +1,5 @@
 :root {
-	--grid-size: 100px;
+	--grid-size: max(80px, 4rem);
 	--grid-gap: 4px;
 	--gap-color: #ADD8E6;
 }
