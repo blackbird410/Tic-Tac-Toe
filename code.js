@@ -177,7 +177,7 @@ function createLayout() {
 	const statusBar = document.createElement('div');
 	statusBar.classList.add('status-bar');
 
-	const statusElement = ['Player(X)', 'Tie', 'Player(O)'];
+	const statusElement = ['Player(X)', 'Draw', 'Player(O)'];
 	statusElement.forEach(elt => {
 		const elementContainer = document.createElement('div');
 		const title = document.createElement('div');
@@ -187,12 +187,18 @@ function createLayout() {
 		title.classList.add('title');
 		score.classList.add('score');
 
-		if (elt[0] == 'T')
+		if (elt[0] == 'D')
 			score.setAttribute('id', 'score-tie');
 		else if (elt[7] == 'X')
+		{
 			score.setAttribute('id', 'score-X');
+			title.setAttribute('id', 'first-player');
+		}
 		else
+		{
 			score.setAttribute('id', 'score-O');
+			title.setAttribute('id', 'second-player');
+		}
 
 		title.textContent = elt;
 		score.textContent = '0';
@@ -206,6 +212,15 @@ function createLayout() {
 	newGameBtn.textContent = 'New Game';
 	newGameBtn.addEventListener('click', restartGame);
 
+	const inputNameBtn = document.createElement('button');
+	inputNameBtn.textContent = 'Add Names';
+	inputNameBtn.addEventListener('click', addNames);
+
+	const btnContainer = document.createElement('div');
+	btnContainer.classList.add('btn-container');
+	btnContainer.appendChild(newGameBtn);
+	btnContainer.appendChild(inputNameBtn);
+
 	const copyright = document.createElement('a');
 	copyright.textContent = 'Copyright \u00A9 Neil Taison Rigaud';
 	copyright.setAttribute('href', 'https://blackbird410.github.io/');
@@ -213,8 +228,66 @@ function createLayout() {
 
 	document.body.appendChild(container);
 	document.body.appendChild(statusBar);
-	document.body.appendChild(newGameBtn);
+	document.body.appendChild(btnContainer);
 	document.body.appendChild(copyright);
+}
+
+function addNames()
+{
+	// Create a simple form that will overlay the game display
+	const form = document.createElement('form');
+	form.setAttribute('id', 'form');
+	
+	let i = 1;
+	['player-X', 'player-O'].forEach(player => {
+		const label = document.createElement('label');
+		label.setAttribute('for', player);
+		label.textContent = `Player ${i}:`;
+
+		const nameInput = document.createElement('input');
+		nameInput.type = 'text';
+		nameInput.setAttribute('id', player);
+		nameInput.setAttribute('name', player);
+		i++;
+
+		form.appendChild(label);
+		form.appendChild(nameInput);
+	});
+
+	const submitBtn = document.createElement('button');
+	const resetBtn =  document.createElement('button');
+	submitBtn.type = 'submit';
+	resetBtn.type = 'reset';
+	submitBtn.textContent = "Submit";
+	resetBtn.textContent = "Reset";
+	submitBtn.addEventListener('click', validateForm);
+
+	const btnContainer = document.createElement('div');
+	btnContainer.classList.add('btn-container');
+
+	btnContainer.appendChild(submitBtn);
+	btnContainer.appendChild(resetBtn);
+	form.appendChild(btnContainer);
+	form.noValidate = true;
+
+	const container = document.querySelector('.main-container');
+	container.appendChild(form);
+	container.classList.add('container');
+	form.classList.add('overlay');
+}
+
+function validateForm(e) {
+	e.preventDefault();
+
+	const title1 = document.querySelector('#first-player');
+	const title2 = document.querySelector('#second-player');
+	console.log(title2);
+	
+	title1.textContent = document.querySelector('input:first-of-type').value;
+	title2.textContent = document.querySelector('input:last-of-type').value;
+
+	document.querySelector('form').remove();
+	document.querySelector('.main-container').classList.remove('container');
 }
 
 createLayout();
